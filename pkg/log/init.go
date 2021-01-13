@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 	"os"
 )
 
@@ -12,7 +13,8 @@ var sugar *zap.SugaredLogger
 
 func ConfigLog() {
 	// writer
-	ws := getWriter()
+	w := getWriter()
+	ws := zapcore.NewMultiWriteSyncer(zapcore.AddSync(w))
 	// encoder
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -23,9 +25,12 @@ func ConfigLog() {
 
 	logger = zap.New(core)
 	sugar = logger.Sugar()
+
+	// gin
+	configGinLog(w)
 }
 
-func getWriter() zapcore.WriteSyncer {
+func getWriter() io.Writer {
 	l := &lumberjack.Logger{
 		Filename:   "./test.log",
 		MaxSize:    10,
@@ -35,7 +40,7 @@ func getWriter() zapcore.WriteSyncer {
 		Compress:   false,
 	}
 	//l.Rotate()
-	return zapcore.NewMultiWriteSyncer(zapcore.AddSync(l), zapcore.AddSync(os.Stdout))
+	return io.MultiWriter(l, os.Stdout)
 }
 
 // DEBUG
@@ -74,7 +79,7 @@ func Errorw(msg string, keysAndValues ...interface{}) {
 	sugar.Errorw(msg, keysAndValues...)
 }
 
-// Fatal
+// FATAL
 func Fatal(args ...interface{}) {
 	sugar.Fatal(args)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-template/pkg/config"
 	"go-template/pkg/log"
+	"go-template/pkg/route"
 	"os"
 )
 
@@ -28,4 +29,7 @@ func main() {
 
 	// 加载配置文件
 	config.LoadEnvFile(activeProfile)
+
+	// 加载路由并阻塞
+	route.LoadRoutes()
 }
