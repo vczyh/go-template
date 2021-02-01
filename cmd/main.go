@@ -21,13 +21,12 @@ func main() {
 	pwd, _ := os.Getwd()
 	log.Info("PWD:", pwd)
 
+	// 加载配置文件
 	activeProfile := ".env"
 	if *active != "" {
 		activeProfile = fmt.Sprintf(".env-%s", *active)
 	}
 	log.Info("Active Profile:", activeProfile)
-
-	// 加载配置文件
 	config.LoadEnvFile(activeProfile)
 
 	// 加载路由并阻塞

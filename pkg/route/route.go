@@ -7,13 +7,13 @@ import (
 
 
 func LoadRoutes() {
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.Default()
 
 	// router
 	demo.Route(r)
 
-	gin.SetMode(gin.ReleaseMode)
 
 	r.Run(":9000")
 }
