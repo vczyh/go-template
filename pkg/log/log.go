@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -27,7 +28,7 @@ func ConfigLog() {
 	sugar = logger.Sugar()
 
 	// gin
-	configGinLog(w)
+	gin.DefaultWriter = w
 }
 
 func getWriter() io.Writer {
@@ -39,7 +40,6 @@ func getWriter() io.Writer {
 		LocalTime:  true,
 		Compress:   false,
 	}
-	//l.Rotate()
 	return io.MultiWriter(l, os.Stdout)
 }
 

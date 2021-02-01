@@ -5,15 +5,13 @@ import (
 	"go-template/pkg/demo"
 )
 
-
-func LoadRoutes() {
+func ConfigRoutes() {
 	gin.SetMode(gin.ReleaseMode)
-
 	r := gin.Default()
+	loadRoutes(r)
+	r.Run(":8080")
+}
 
-	// router
+func loadRoutes(r *gin.Engine) {
 	demo.Route(r)
-
-
-	r.Run(":9000")
 }
