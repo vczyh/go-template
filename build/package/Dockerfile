@@ -7,6 +7,7 @@ ENV GOOS=linux
 ENV GOARCH=amd64
 
 RUN go env -w GOPROXY=https://goproxy.io,direct
+
 WORKDIR /build
 COPY . .
 RUN go build -o . ./cmd/myapp

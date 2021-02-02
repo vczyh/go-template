@@ -1,12 +1,12 @@
 .PHONY: build
 
-all: pre build
+all: pre build docker
 
 pre:
 	chmod -R +x scripts
 
-build:
+build: pre
 	./scripts/app_build.sh
 
-docker:
+docker: pre
 	./scripts/docker_build.sh
