@@ -1,21 +1,31 @@
 package route
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
-	"go-template/pkg/demo"
 	"os"
 )
 
-func ConfigRoutes() {
+type Route func(r *gin.Engine)
+
+var routes []Route
+
+func AddRoutes(rs ...Route) {
+	routes = append(routes,rs...)
+}
+
+func Run(ctx context.Context) {
 	gin.SetMode(os.Getenv("GIN_MODE"))
 	r := gin.Default()
-	r.Use(addRequestId, auth)
+	r.Use(addRequestId(ctx))
 	loadRoutes(r)
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":8081"); err != nil {
 		panic(err)
 	}
 }
 
 func loadRoutes(r *gin.Engine) {
-	demo.Route(r)
+	for _, route := range routes {
+		route(r)
+	}
 }
