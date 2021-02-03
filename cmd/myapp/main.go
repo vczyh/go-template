@@ -13,14 +13,14 @@ var active = flag.String("active", "", "active profile")
 
 func main() {
 
+	flag.Parse()
+
 	log.ConfigLog()
 
 	err := info.PrintInfo()
 	if err != nil {
 		log.Fatal("failed print info")
 	}
-
-	flag.Parse()
 
 	activeProfile := ".env"
 	if *active != "" {
