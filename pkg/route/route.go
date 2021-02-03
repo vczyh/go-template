@@ -1,12 +1,15 @@
 package route
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-template/pkg/demo"
+	"os"
 )
 
 func ConfigRoutes() {
-	gin.SetMode(gin.ReleaseMode)
+	fmt.Println(os.Getenv(gin.EnvGinMode))
+	//gin.SetMode(os.Getenv("GIN_MODE"))
 	r := gin.Default()
 	loadRoutes(r)
 	r.Run(":8080")

@@ -1,7 +1,6 @@
 package log
 
 import (
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -28,12 +27,13 @@ func ConfigLog() {
 	sugar = logger.Sugar()
 
 	// gin
-	gin.DefaultWriter = w
+	//gin.DefaultWriter = w
 }
 
 func getWriter() io.Writer {
+	logPath := os.Getenv("LOG_PATH")
 	l := &lumberjack.Logger{
-		Filename:   "./test.log",
+		Filename:   logPath,
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,
