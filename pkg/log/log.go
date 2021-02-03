@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -8,8 +9,10 @@ import (
 	"os"
 )
 
-var logger *zap.Logger
-var sugar *zap.SugaredLogger
+var (
+	logger *zap.Logger
+	sugar  *zap.SugaredLogger
+)
 
 func ConfigLog() {
 	// writer
@@ -27,7 +30,7 @@ func ConfigLog() {
 	sugar = logger.Sugar()
 
 	// gin
-	//gin.DefaultWriter = w
+	gin.DefaultWriter = w
 }
 
 func getWriter() io.Writer {

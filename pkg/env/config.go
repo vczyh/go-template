@@ -4,9 +4,22 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"go-template/pkg/flag"
 	"os"
 	"strings"
 )
+
+func MustConfigEnv() {
+	active := flag.Active
+	activeProfile := ".env"
+	if active != "" {
+		activeProfile = fmt.Sprintf(".env-%s", active)
+	}
+	fmt.Printf("active profile: %s\n", activeProfile)
+	if err := LoadEnvFile(activeProfile); err != nil {
+		panic(err)
+	}
+}
 
 func LoadEnvFile(profile string) error {
 	file, err := os.Open(profile)

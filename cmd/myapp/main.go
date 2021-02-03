@@ -1,32 +1,18 @@
 package main
 
 import (
-	"flag"
-	"fmt"
+	"context"
 	"go-template/pkg/env"
+	"go-template/pkg/flag"
 	"go-template/pkg/log"
 	"go-template/pkg/route"
 )
 
-var active = flag.String("active", "", "active profile")
+var Ctx
 
 func main() {
+	//ctx = 1
 
-	flag.Parse()
-
-	// env
-	activeProfile := ".env"
-	if *active != "" {
-		activeProfile = fmt.Sprintf(".env-%s", *active)
-	}
-	fmt.Printf("active profile: %s\n", activeProfile)
-	if err := env.LoadEnvFile(activeProfile); err != nil {
-		panic(err)
-	}
-
-	// log
-	log.ConfigLog()
-
-	// route
+	// blocking
 	route.ConfigRoutes()
 }
