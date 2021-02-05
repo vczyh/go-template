@@ -2,34 +2,20 @@ package demo
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-template/pkg/log"
+	"go-template/pkg/route"
 )
-
-const contextKey = "context"
 
 func Route(router *gin.Engine) {
 	r := router.Group("demo/v1")
 
-	r.GET("", handle(func(ctx context.Context, c *gin.Context) {
-		fmt.Println(ctx.Value("reqId"))
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	}))
-
+	r.GET("", route.Handle(test))
 }
 
-type HandlerFunc func(context.Context, *gin.Context)
-
-func handle(handlerFunc HandlerFunc) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if val, ok := c.Get(contextKey); ok {
-			if ctxVal, ok := val.(context.Context); ok {
-				handlerFunc(ctxVal, c)
-				return
-			}
-			// todo error
-		}
-	}
+func test(ctx context.Context, c *gin.Context) {
+	log.Debugw(ctx, "test request ID", "key11", "val11")
+	c.JSON(200, gin.H{
+		"message": "pong",
+	})
 }

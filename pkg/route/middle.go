@@ -2,24 +2,22 @@ package route
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"math/rand"
 )
 
 const contextKey = "context"
 
-func addRequestId(ctx context.Context) gin.HandlerFunc {
+func ContextMiddle(ctx context.Context, key string, valFunc func() interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		reqId := fmt.Sprintf("_reqId-%d", rand.Int())
+		value := valFunc()
 		if val, ok := c.Get(contextKey); ok {
 			if ctxVal, ok := val.(context.Context); ok {
-				c.Set(contextKey, context.WithValue(ctxVal, "reqId", reqId))
+				c.Set(contextKey, context.WithValue(ctxVal, key, value))
 				return
 			}
 			// todo  error
 		}
-		c.Set(contextKey, context.WithValue(ctx, "reqId", reqId))
+		c.Set(contextKey, context.WithValue(ctx, key, value))
 	}
 }
 
@@ -27,12 +25,12 @@ func addRequestId(ctx context.Context) gin.HandlerFunc {
 //	return func(c *gin.Context) {
 //		if val, ok := c.Get(contextKey); ok {
 //			if ctxVal, ok := val.(context.Context); ok {
-//				c.Set(contextKey, log.NewContext(ctxVal, name))
+//				c.Set(contextKey, context.WithValue(ctxVal, "name", name))
 //				return
 //			}
 //			// todo  error
 //		}
-//		c.Set(contextKey, NewContext(ctx, name))
+//		c.Set(contextKey, context.WithValue(ctx, "name", name))
 //	}
 //}
 

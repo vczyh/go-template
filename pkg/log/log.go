@@ -1,6 +1,7 @@
 package log
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -14,7 +15,9 @@ var (
 	sugar  *zap.SugaredLogger
 )
 
-func ConfigLog() {
+var contextKeys []string
+
+func ConfigLog(keys []string) {
 	// writer
 	w := getWriter()
 	ws := zapcore.NewMultiWriteSyncer(zapcore.AddSync(w))
@@ -31,6 +34,8 @@ func ConfigLog() {
 
 	// gin
 	gin.DefaultWriter = w
+
+	contextKeys = keys
 }
 
 func getWriter() io.Writer {
@@ -46,47 +51,63 @@ func getWriter() io.Writer {
 	return io.MultiWriter(l, os.Stdout)
 }
 
+func Debugw(ctx context.Context, msg string, keysAndValues ...interface{}) {
+	sugar.Debugw(msg, contextInfo(ctx, keysAndValues...)...)
+}
+
+func Infow(ctx context.Context, msg string, keysAndValues ...interface{}) {
+	sugar.Infow(msg, contextInfo(ctx, keysAndValues)...)
+}
+
+func contextInfo(ctx context.Context, keysAndValues ...interface{}) []interface{} {
+	var kvs []interface{}
+	for _, key := range contextKeys {
+		kvs = append(kvs, key, ctx.Value(key))
+	}
+	return append(kvs, keysAndValues...)
+}
+
 // DEBUG
-func Debug(args ...interface{}) {
+func debug(args ...interface{}) {
 	sugar.Debug(args)
 }
 
-func Debugw(msg string, keysAndValues ...interface{}) {
+func debugw(msg string, keysAndValues ...interface{}) {
 	sugar.Debugw(msg, keysAndValues...)
 }
 
 // INFO
-func Info(args ...interface{}) {
+func info(args ...interface{}) {
 	sugar.Info(args)
 }
 
-func Infow(msg string, keysAndValues ...interface{}) {
+func infow(msg string, keysAndValues ...interface{}) {
 	sugar.Infow(msg, keysAndValues...)
 }
 
 // WARN
-func Warn(args ...interface{}) {
+func warn(args ...interface{}) {
 	sugar.Warn(args)
 }
 
-func Warnw(msg string, keysAndValues ...interface{}) {
+func warnw(msg string, keysAndValues ...interface{}) {
 	sugar.Warnw(msg, keysAndValues...)
 }
 
 // ERROR
-func Error(args ...interface{}) {
+func error(args ...interface{}) {
 	sugar.Error(args)
 }
 
-func Errorw(msg string, keysAndValues ...interface{}) {
+func errorw(msg string, keysAndValues ...interface{}) {
 	sugar.Errorw(msg, keysAndValues...)
 }
 
 // FATAL
-func Fatal(args ...interface{}) {
+func fatal(args ...interface{}) {
 	sugar.Fatal(args)
 }
 
-func Fatalw(msg string, keysAndValues ...interface{}) {
+func fatalw(msg string, keysAndValues ...interface{}) {
 	sugar.Fatalw(msg, keysAndValues...)
 }

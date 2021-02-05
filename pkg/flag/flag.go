@@ -7,6 +7,6 @@ var (
 )
 
 func ConfigFlag() {
-	flag.StringVar(&Active,"active","","active profile")
+	flag.StringVar(&Active, "active", "", "active profile")
 	flag.Parse()
 }
