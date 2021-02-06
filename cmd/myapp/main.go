@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"go-template/pkg/demo"
 	"go-template/pkg/env"
 	"go-template/pkg/flag"
 	"go-template/pkg/log"
 	"go-template/pkg/route"
+	"io"
 	"math/rand"
+	"os"
 )
 
 func main() {
@@ -17,26 +20,35 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// flag
 	flag.ConfigFlag()
 
+	// config
 	env.MustConfigEnv()
-
-	//log.ConfigLog([]string{"reqId"})
 
 
 
 	// log
-	log.NewLogger("DEMO",)
+	logPath := os.Getenv("LOG_PATH")
+	appFileWriter := log.NewFileWriter(logPath, 10, 5, 30)
+	ginFileWriter := log.NewFileWriter("gin.log", 10, 5, 30)
 
-	// http
-	server := route.NewHttpServer(ctx, ":8081")
-	// 为每个请求添加requestID
-	server.AddMiddleware(route.ContextMiddle(server.Ctx, "reqId", func() interface{} {
+	gin.DefaultWriter = io.MultiWriter(ginFileWriter, os.Stdout)
+	gin.DefaultErrorWriter = io.MultiWriter(ginFileWriter, os.Stdout)
+
+	demoLogger := log.NewLogger("Demo", []string{"reqId"}, appFileWriter, os.Stdout)
+	demo.WithLogger(demoLogger)
+
+	// http server
+	s := route.NewHttpServer(ctx, ":8081")
+
+	s.AddMiddleware(route.ContextKeyAndValueMiddle(s.Ctx, "reqId", func() interface{} {
 		return fmt.Sprintf("%d", rand.Int())
 	}))
-	// 添加路由
-	server.AddRoute(demo.Route)
-	if err := server.Run(); err != nil {
+
+	s.AddRoute(demo.Route)
+
+	if err := s.Run(); err != nil {
 		panic(err)
 	}
 }

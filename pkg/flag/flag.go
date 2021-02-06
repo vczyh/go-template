@@ -1,6 +1,8 @@
 package flag
 
-import "flag"
+import (
+	"flag"
+)
 
 var (
 	Active = ""

@@ -3,7 +3,6 @@ package demo
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"go-template/pkg/log"
 	"go-template/pkg/route"
 )
 
@@ -14,7 +13,7 @@ func Route(router *gin.Engine) {
 }
 
 func test(ctx context.Context, c *gin.Context) {
-	log.Debugw(ctx, "test request ID", "key11", "val11")
+	logger.Debug(ctx, "test request ID", "key11", "val11")
 	c.JSON(200, gin.H{
 		"message": "pong",
 	})
