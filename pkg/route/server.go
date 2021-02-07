@@ -2,6 +2,7 @@ package route
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +24,7 @@ func Handle(handlerFunc HandlerFunc) gin.HandlerFunc {
 
 // server
 type HttpServer struct {
-	Ctx context.Context
+	ctx context.Context
 
 	addr        string
 	middlewares []gin.HandlerFunc
@@ -32,7 +33,7 @@ type HttpServer struct {
 
 func NewHttpServer(ctx context.Context, addr string) *HttpServer {
 	return &HttpServer{
-		Ctx:  ctx,
+		ctx:  ctx,
 		addr: addr,
 	}
 }
@@ -49,16 +50,26 @@ func (h *HttpServer) AddRoute(routes ...Route) {
 	h.routes = append(h.routes, routes...)
 }
 
-func (h *HttpServer) Run() error {
-	//r := gin.Default()
+func (h *HttpServer) Run(mode string) (err error) {
+	defer func() {
+		if p := recover(); p != nil {
+			err = errors.New(p.(string))
+		}
+	}()
+	// PANIC
+	gin.SetMode(mode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 	r.Use(h.middlewares...)
 	for _, route := range h.routes {
 		route(r)
 	}
-	if err := r.Run(h.addr); err != nil {
+	if err = r.Run(h.addr); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (h *HttpServer) WithContextKeyAndValueMiddle(key string, valFunc ValueFunc) gin.HandlerFunc {
+	return ContextKeyAndValueMiddle(h.ctx, key, valFunc)
 }

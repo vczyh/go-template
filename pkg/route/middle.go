@@ -7,7 +7,9 @@ import (
 
 const contextKey = "context"
 
-func ContextKeyAndValueMiddle(ctx context.Context, key string, valFunc func() interface{}) gin.HandlerFunc {
+type ValueFunc func() interface{}
+
+func ContextKeyAndValueMiddle(ctx context.Context, key string, valFunc ValueFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		value := valFunc()
 		if val, ok := c.Get(contextKey); ok {

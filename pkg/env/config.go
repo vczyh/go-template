@@ -2,23 +2,17 @@ package env
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
-	"go-template/pkg/flag"
 	"os"
 	"strings"
 )
 
-func MustConfigEnv() {
-	active := flag.Active
-	activeProfile := ".env"
-	if active != "" {
-		activeProfile = fmt.Sprintf(".env-%s", active)
+func ConfigEnv(activeProfile string) error {
+	err := LoadEnvFile(activeProfile)
+	if err != nil {
+		return err
 	}
-	fmt.Printf("active profile: %s\n", activeProfile)
-	if err := LoadEnvFile(activeProfile); err != nil {
-		panic(err)
-	}
+	return nil
 }
 
 func LoadEnvFile(profile string) error {
@@ -41,7 +35,7 @@ func LoadEnvFile(profile string) error {
 		}
 		strs := strings.Split(line, "=")
 		if len(strs) != 2 {
-			return errors.New(fmt.Sprintf("failed to parse environment variable: %s", line))
+			return fmt.Errorf("failed to parse environment variable: %s\n", line)
 		}
 
 		key, val := strings.TrimSpace(strs[0]), strings.TrimSpace(strs[1])
