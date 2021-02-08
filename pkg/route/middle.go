@@ -21,3 +21,12 @@ func ContextKeyAndValueMiddle(ctx context.Context, key string, valFunc ValueFunc
 		c.Set(contextKey, context.WithValue(ctx, key, value))
 	}
 }
+
+func AddContextIfNotExist(ctx context.Context) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if val, ok := c.Get(contextKey); ok && val != nil {
+			return
+		}
+		c.Set(contextKey,context.WithValue(ctx,"key","vale"))
+	}
+}

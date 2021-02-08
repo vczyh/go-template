@@ -1,0 +1,8 @@
+http:
+  port: 8082
+  mode: release
+log:
+  app:
+    path: logs/app.log
+    level: DEBUG
+  access-log: logs/access.log

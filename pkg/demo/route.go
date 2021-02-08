@@ -13,7 +13,8 @@ func Route(router *gin.Engine) {
 }
 
 func test(ctx context.Context, c *gin.Context) {
-	logger.Debug(ctx, "test request ID", "key11", "val11")
+	logger.Debug(ctx, "demo test with request id")
+	ctx.Done()
 	c.JSON(200, gin.H{
 		"message": "pong",
 	})

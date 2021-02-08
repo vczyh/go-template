@@ -78,7 +78,7 @@ func (l *Logger) contextKeysAndValues(ctx context.Context, keysAndValues ...inte
 	return append(kvs, keysAndValues...)
 }
 
-func NewFileWriter(file string, maxSize int, maxBackups int, maxAge int) io.WriteCloser {
+func NewRotate(file string, maxSize int, maxBackups int, maxAge int) io.WriteCloser {
 	return &lumberjack.Logger{
 		Filename:   file,
 		MaxSize:    maxSize,

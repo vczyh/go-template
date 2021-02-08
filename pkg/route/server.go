@@ -6,8 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Route func(r *gin.Engine)
-
 type HandlerFunc func(context.Context, *gin.Context)
 
 func Handle(handlerFunc HandlerFunc) gin.HandlerFunc {
@@ -31,6 +29,8 @@ type HttpServer struct {
 	routes      []Route
 }
 
+type Route func(r *gin.Engine)
+
 func NewHttpServer(ctx context.Context, addr string) *HttpServer {
 	return &HttpServer{
 		ctx:  ctx,
@@ -42,8 +42,8 @@ func (h *HttpServer) Bind(addr string) {
 	h.addr = addr
 }
 
-func (h *HttpServer) AddMiddleware(middle gin.HandlerFunc) {
-	h.middlewares = append(h.middlewares, middle)
+func (h *HttpServer) AddMiddleware(middles ...gin.HandlerFunc) {
+	h.middlewares = append(h.middlewares, middles...)
 }
 
 func (h *HttpServer) AddRoute(routes ...Route) {
@@ -59,17 +59,23 @@ func (h *HttpServer) Run(mode string) (err error) {
 	// PANIC
 	gin.SetMode(mode)
 	r := gin.New()
+
+	h.AddMiddleware(gin.Logger(), gin.Recovery(), AddContextIfNotExist(h.ctx))
 	r.Use(gin.Logger(), gin.Recovery())
 	r.Use(h.middlewares...)
+
 	for _, route := range h.routes {
 		route(r)
 	}
+
 	if err = r.Run(h.addr); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (h *HttpServer) WithContextKeyAndValueMiddle(key string, valFunc ValueFunc) gin.HandlerFunc {
-	return ContextKeyAndValueMiddle(h.ctx, key, valFunc)
+func (h *HttpServer) WithContextKeyAndValueMiddle(key string, valFunc ValueFunc) {
+	middle := ContextKeyAndValueMiddle(h.ctx, key, valFunc)
+	h.AddMiddleware(middle)
 }

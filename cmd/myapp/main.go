@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-template/pkg/config"
 	"go-template/pkg/demo"
-	"go-template/pkg/env"
 	"go-template/pkg/log"
 	"go-template/pkg/route"
 	"io"
@@ -18,6 +18,10 @@ const (
 	requestIdKey = "requestId"
 )
 
+var (
+	configFile = "config.yml"
+)
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -26,38 +30,27 @@ func main() {
 	flag.StringVar(&active, "active", "", "active profile")
 	flag.Parse()
 
-	// config
-	activeProfile := ".env"
-	if active != "" {
-		activeProfile = fmt.Sprintf(".env-%s", active)
-	}
-	fmt.Printf("active profile: %s\n", activeProfile)
-	if err := env.ConfigEnv(activeProfile); err != nil {
+	if err := config.LoadConfig(configFile); err != nil {
 		panic(err)
 	}
 
 	// log
-	logPath := os.Getenv("LOG_PATH")
-	ginLogPath := os.Getenv("GIN_LOG_PATH")
-	appFileWriter := log.NewFileWriter(logPath, 10, 5, 30)
-	ginFileWriter := log.NewFileWriter(ginLogPath, 10, 5, 30)
+	app := log.NewRotate(config.C.Log.App.Path, 10, 5, 30)
+	access := log.NewRotate(config.C.Log.AccessLog, 10, 5, 30)
 
-	gin.DefaultWriter = io.MultiWriter(ginFileWriter)
-	gin.DefaultErrorWriter = io.MultiWriter(ginFileWriter, os.Stdout)
+	gin.DefaultWriter = io.MultiWriter(access, os.Stdout)
+	gin.DefaultErrorWriter = io.MultiWriter(access, os.Stdout)
 
-	demoLogger := log.NewLogger("Demo", []string{requestIdKey}, appFileWriter, os.Stdout)
+	demoLogger := log.NewLogger("Demo", []string{requestIdKey}, app, os.Stdout)
 	demo.WithLogger(demoLogger)
 
 	// http server
-	s := route.NewHttpServer(ctx, ":8081")
-
+	s := route.NewHttpServer(ctx, fmt.Sprintf(":%d", config.C.Http.Port))
 	s.WithContextKeyAndValueMiddle(requestIdKey, func() interface{} {
 		return fmt.Sprintf("%d", rand.Int())
 	})
-
 	s.AddRoute(demo.Route)
-
-	if err := s.Run(os.Getenv("GIN_MODE")); err != nil {
+	if err := s.Run(config.C.Http.Mode); err != nil {
 		panic(err)
 	}
 }
