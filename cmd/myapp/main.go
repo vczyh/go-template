@@ -10,10 +10,6 @@ import (
 	"os"
 )
 
-const (
-	requestIdKey = "requestId"
-)
-
 var (
 	configFile = "config.yml"
 )
