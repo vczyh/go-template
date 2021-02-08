@@ -1,16 +1,12 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-template/pkg/config"
 	"go-template/pkg/demo"
 	"go-template/pkg/log"
 	"go-template/pkg/route"
-	"io"
-	"math/rand"
 	"os"
 )
 
@@ -23,9 +19,6 @@ var (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	var active string
 	flag.StringVar(&active, "active", "", "active profile")
 	flag.Parse()
@@ -35,20 +28,17 @@ func main() {
 	}
 
 	// log
-	app := log.NewRotate(config.C.Log.App.Path, 10, 5, 30)
-	access := log.NewRotate(config.C.Log.AccessLog, 10, 5, 30)
+	appWriter := log.NewRotate(config.C.Log.App.Path, 10, 5, 30)
+	accessWriter := log.NewRotate(config.C.Log.Http.AccessLog, 10, 5, 30)
+	errWriter := log.NewRotate(config.C.Log.Http.ErrorLog, 10, 5, 30)
 
-	gin.DefaultWriter = io.MultiWriter(access, os.Stdout)
-	gin.DefaultErrorWriter = io.MultiWriter(access, os.Stdout)
-
-	demoLogger := log.NewLogger("Demo", []string{requestIdKey}, app, os.Stdout)
+	demoLogger := log.NewLogger("Demo", appWriter, os.Stdout)
 	demo.WithLogger(demoLogger)
 
 	// http server
-	s := route.NewHttpServer(ctx, fmt.Sprintf(":%d", config.C.Http.Port))
-	s.WithContextKeyAndValueMiddle(requestIdKey, func() interface{} {
-		return fmt.Sprintf("%d", rand.Int())
-	})
+	s := route.NewHttpServer(fmt.Sprintf(":%d", config.C.Http.Port))
+	s.AccessWriters(accessWriter)
+	s.ErrWriters(errWriter, os.Stdout)
 	s.AddRoute(demo.Route)
 	if err := s.Run(config.C.Http.Mode); err != nil {
 		panic(err)

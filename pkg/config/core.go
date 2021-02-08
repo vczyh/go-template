@@ -16,7 +16,10 @@ var C = struct {
 			Path  string
 			Level string
 		}
-		AccessLog string `yaml:"access-log"`
+		Http struct {
+			AccessLog string `yaml:"access-log"`
+			ErrorLog  string `yaml:"error-log"`
+		}
 	}
 }{}
 

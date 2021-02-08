@@ -1,7 +1,6 @@
 package log
 
 import (
-	"context"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -9,17 +8,15 @@ import (
 )
 
 type Logger struct {
-	serviceName string
-	contextKeys []string
+	name string
 
 	base  *zap.Logger
 	sugar *zap.SugaredLogger
 }
 
-func NewLogger(serviceName string, contextKeys []string, writers ...io.Writer) *Logger {
+func NewLogger(name string, writers ...io.Writer) *Logger {
 	logger := &Logger{
-		serviceName: serviceName,
-		contextKeys: contextKeys,
+		name: name,
 	}
 	// encoder
 	encoderConfig := zapcore.EncoderConfig{
@@ -51,7 +48,7 @@ func NewLogger(serviceName string, contextKeys []string, writers ...io.Writer) *
 		zap.AddCaller(),
 		zap.AddCallerSkip(1),
 	)
-	l = l.Named(logger.serviceName)
+	l = l.Named(logger.name)
 
 	logger.base = l
 	logger.sugar = l.Sugar()
@@ -59,23 +56,8 @@ func NewLogger(serviceName string, contextKeys []string, writers ...io.Writer) *
 	return logger
 }
 
-func (l *Logger) name() {
-
-}
-
-func (l *Logger) Debug(ctx context.Context, msg string, keysAndValues ...interface{}) {
-	l.sugar.Debugw(msg, l.contextKeysAndValues(ctx, keysAndValues...)...)
-}
-
-func (l *Logger) contextKeysAndValues(ctx context.Context, keysAndValues ...interface{}) []interface{} {
-	if ctx == nil {
-		return keysAndValues
-	}
-	var kvs []interface{}
-	for _, key := range l.contextKeys {
-		kvs = append(kvs, key, ctx.Value(key))
-	}
-	return append(kvs, keysAndValues...)
+func (l *Logger) Debug(msg string, kvs ...interface{}) {
+	l.sugar.Debugw(msg, kvs...)
 }
 
 func NewRotate(file string, maxSize int, maxBackups int, maxAge int) io.WriteCloser {

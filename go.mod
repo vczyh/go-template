@@ -18,5 +18,5 @@ require (
 	golang.org/x/tools v0.0.0-20191112195655-aa38f8e97acc
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 )
