@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/spf13/cobra"
 	"go-template/pkg/config"
 	"go-template/pkg/demo"
 	"go-template/pkg/log"
@@ -12,12 +13,22 @@ import (
 
 var (
 	configFile = "config.yml"
+
+	rootCmd = &cobra.Command{
+		Use:   "myapp",
+		Short: "A generator for Cobra based Applications",
+		Long: `Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	}
 )
 
 func main() {
 	var active string
 	flag.StringVar(&active, "active", "", "active profile")
 	flag.Parse()
+
+	//rootCmd.PersistentFlags().StringVar(&configFile,)
 
 	if err := config.LoadConfig(configFile); err != nil {
 		panic(err)
