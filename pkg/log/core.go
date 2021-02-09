@@ -14,7 +14,7 @@ type Logger struct {
 	sugar *zap.SugaredLogger
 }
 
-func NewLogger(name string, writers ...io.Writer) *Logger {
+func NewLogger(name string, level string, writers ...io.Writer) *Logger {
 	logger := &Logger{
 		name: name,
 	}
@@ -34,14 +34,27 @@ func NewLogger(name string, writers ...io.Writer) *Logger {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	level := zap.NewAtomicLevelAt(zap.DebugLevel)
+	var lev zap.AtomicLevel
+	switch level {
+	case "DEBUG":
+		lev = zap.NewAtomicLevelAt(zap.DebugLevel)
+	case "INFO":
+		lev = zap.NewAtomicLevelAt(zap.InfoLevel)
+	case "WARN":
+		lev = zap.NewAtomicLevelAt(zap.WarnLevel)
+	case "ERROR":
+		lev = zap.NewAtomicLevelAt(zap.ErrorLevel)
+	default:
+		lev = zap.NewAtomicLevelAt(zap.InfoLevel)
+	}
+
 	ws := io.MultiWriter(writers...)
 
 	core := zapcore.NewCore(
 		//zapcore.NewJSONEncoder(encoderConfig),
 		zapcore.NewConsoleEncoder(encoderConfig),
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(ws)),
-		level,
+		lev,
 	)
 	l := zap.New(
 		core,

@@ -12,7 +12,6 @@ func Route(router *gin.Engine) {
 }
 
 func test(c *gin.Context) (interface{}, error) {
-
 	q := c.Param("q")
 
 	logger.Debug("test request")
