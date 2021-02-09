@@ -14,9 +14,18 @@ spec:
     spec:
       containers:
         - name: myapp
-          image: myapp
+          image: harbor.local.com/demo/myapp
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/myapp
       restartPolicy: Always
+      volumes:
+        - name: config
+          configMap:
+            name: myapp
   selector:
     matchLabels:
       app: myapp

@@ -1,23 +1,21 @@
 # Build
-FROM golang:alpine AS builder
+FROM golang:1.15.8 AS builder
 
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
-RUN go env -w GOPROXY=https://goproxy.io,direct
-
-WORKDIR /build
+WORKDIR /myapp
 COPY . .
-RUN go build -o . ./cmd/myapp
+
+RUN chmod -R +x scripts
+RUN scripts/app_build.sh
 
 # Run
 FROM scratch
 
-ENV APP_HOST=zhangeek.com
+COPY config.yml /etc/myapp/
 
-COPY .env /
-COPY --from=builder /build/myapp /
+WORKDIR /
+COPY --from=builder /myapp/bin/myapp .
+
 EXPOSE 8080
+
 ENTRYPOINT ["/myapp"]
+CMD ["--config","/etc/myapp/config.yml"]
