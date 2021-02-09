@@ -60,6 +60,18 @@ func (l *Logger) Debug(msg string, kvs ...interface{}) {
 	l.sugar.Debugw(msg, kvs...)
 }
 
+func (l *Logger) Info(msg string, kvs ...interface{}) {
+	l.sugar.Infow(msg, kvs...)
+}
+
+func (l *Logger) Infof(template string, args ...interface{}) {
+	l.sugar.Infof(template, args...)
+}
+
+func (l *Logger) Warn(msg string, kvs ...interface{}) {
+	l.sugar.Warnw(msg, kvs...)
+}
+
 func NewRotate(file string, maxSize int, maxBackups int, maxAge int) io.WriteCloser {
 	return &lumberjack.Logger{
 		Filename:   file,

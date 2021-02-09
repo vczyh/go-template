@@ -5,7 +5,7 @@ metadata:
 data:
   config.yml: |
     http:
-      port: 8082
+      port: 8080
       mode: release
     log:
       app:

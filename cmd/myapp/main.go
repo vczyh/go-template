@@ -14,7 +14,7 @@ var (
 	configFile string
 
 	rootCmd = &cobra.Command{
-		Use:   "myapp",
+		Use: "myapp",
 	}
 )
 
@@ -34,8 +34,12 @@ func main() {
 	accessWriter := log.NewRotate(config.C.Log.Http.AccessLog, 10, 5, 30)
 	errWriter := log.NewRotate(config.C.Log.Http.ErrorLog, 10, 5, 30)
 
+	appLogger := log.NewLogger("App", appWriter, os.Stdout)
 	demoLogger := log.NewLogger("Demo", appWriter, os.Stdout)
 	demo.WithLogger(demoLogger)
+
+	appLogger.Infof("config file: %s", configFile)
+	appLogger.Infof("http initialized with port: %d", config.C.Http.Port)
 
 	// http server
 	s := route.NewHttpServer(fmt.Sprintf(":%d", config.C.Http.Port))

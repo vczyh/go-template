@@ -1,4 +1,4 @@
-all: test build docker
+all: test build docker push
 
 .PHONY: pre
 pre:
@@ -15,3 +15,7 @@ build: pre
 .PHONY: docker
 docker: pre
 	scripts/docker_build.sh
+
+.PHONY: push
+push: pre
+	scripts/docker_push.sh

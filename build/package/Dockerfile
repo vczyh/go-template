@@ -1,14 +1,7 @@
 # Build
 FROM golang:1.15.8 AS builder
 
-#ENV GO111MODULE=on \
-#    CGO_ENABLED=0 \
-#    GOOS=linux \
-#    GOARCH=amd64
-#
-#RUN go env -w GOPROXY=https://goproxy.io,direct
-
-WORKDIR /build
+WORKDIR /myapp
 COPY . .
 
 RUN chmod -R +x scripts
@@ -17,12 +10,12 @@ RUN scripts/app_build.sh
 # Run
 FROM scratch
 
-WORKDIR /
+COPY config.yml /etc/myapp/
 
-COPY config.yml .
-COPY --from=builder /build/bin/myapp .
+WORKDIR /
+COPY --from=builder /myapp/bin/myapp .
 
 EXPOSE 8080
 
 ENTRYPOINT ["/myapp"]
-CMD ["--config","config.yml"]
+CMD ["--config","/etc/myapp/config.yml"]
