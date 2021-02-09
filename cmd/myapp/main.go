@@ -15,7 +15,6 @@ var (
 
 	rootCmd = &cobra.Command{
 		Use:   "myapp",
-		Short: "Golang App CLI",
 	}
 )
 

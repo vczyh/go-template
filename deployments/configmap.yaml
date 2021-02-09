@@ -3,4 +3,14 @@ kind: ConfigMap
 metadata:
   name: myapp
 data:
-  key:
+  config.yml: |
+    http:
+      port: 8082
+      mode: release
+    log:
+      app:
+        path: logs/app.log
+        level: DEBUG
+      http:
+        access-log: logs/access.log
+        error-log: logs/error.log
