@@ -39,8 +39,8 @@ func main() {
 	accessWriter := log.NewRotate(c.GetString("log.http.access-log"), 10, 5, 30)
 	errWriter := log.NewRotate(c.GetString("log.http.error-log"), 10, 5, 30)
 
-	appLogger := log.NewLogger("App", c.GetString("log.level"), appWriter, os.Stdout)
-	demoLogger := log.NewLogger("Demo", c.GetString("log.level"), appWriter, os.Stdout)
+	appLogger := log.New("App", c.GetString("log.level"), appWriter, os.Stdout)
+	demoLogger := log.New("Demo", c.GetString("log.level"), appWriter, os.Stdout)
 	demo.WithLogger(demoLogger)
 
 	appLogger.Infof("config file: %s", configFile)

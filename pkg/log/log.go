@@ -14,7 +14,7 @@ type Logger struct {
 	sugar *zap.SugaredLogger
 }
 
-func NewLogger(name string, level string, writers ...io.Writer) *Logger {
+func New(name string, level string, writers ...io.Writer) *Logger {
 	logger := &Logger{
 		name: name,
 	}
