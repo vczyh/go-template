@@ -6,8 +6,8 @@ import (
 )
 
 func TestLoggerWithStdout(t *testing.T) {
-	logger := NewLogger("TestLogger", "DEBUG", os.Stdout)
+	l := New("TestLogger", "DEBUG", os.Stdout)
 
-	logger.Debug("log content")
-	logger.Debug("log content with key and value", "key", "val")
+	l.Debug("log content")
+	l.Debug("log content with key and value", "key", "val")
 }

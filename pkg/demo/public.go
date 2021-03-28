@@ -1,10 +1,20 @@
 package demo
 
-import "go-template/pkg/log"
+import (
+	"go-template/pkg/config"
+	"go-template/pkg/log"
+)
 
 // log
-var logger *log.Logger
+var l *log.Logger
 
-func WithLogger(l *log.Logger) {
-	logger = l
+func WithLogger(logger *log.Logger) {
+	l = logger
+}
+
+// config
+var c *config.Config
+
+func WithConfig(config *config.Config) {
+	c = config
 }

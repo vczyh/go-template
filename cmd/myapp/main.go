@@ -25,31 +25,30 @@ func main() {
 		panic(err)
 	}
 
+	// config
 	c, err := config.New(configFile)
 	if err != nil {
 		panic(err)
 	}
-
-	//if err := config.LoadConfig(configFile); err != nil {
-	//	panic(err)
-	//}
+	demo.WithConfig(c)
 
 	// log
-	appWriter := log.NewRotate(c.GetString("log.path"), 10, 5, 30)
-	accessWriter := log.NewRotate(c.GetString("log.http.access-log"), 10, 5, 30)
-	errWriter := log.NewRotate(c.GetString("log.http.error-log"), 10, 5, 30)
+	writer := log.NewRotate(c.GetString("log.path"), 10, 5, 30)
+	httpAccessWriter := log.NewRotate(c.GetString("log.http.access-log"), 10, 5, 30)
+	httpErrWriter := log.NewRotate(c.GetString("log.http.error-log"), 10, 5, 30)
+	// app
+	appLog := log.New("App", c.GetString("log.level"), writer, os.Stdout)
+	// demo
+	demoLog := log.New("Demo", c.GetString("log.level"), writer, os.Stdout)
+	demo.WithLogger(demoLog)
 
-	appLogger := log.New("App", c.GetString("log.level"), appWriter, os.Stdout)
-	demoLogger := log.New("Demo", c.GetString("log.level"), appWriter, os.Stdout)
-	demo.WithLogger(demoLogger)
-
-	appLogger.Infof("config file: %s", configFile)
-	appLogger.Infof("http initialized with port: %d", c.Get("http.port"))
+	appLog.Infof("config file: %s", configFile)
+	appLog.Infof("http initialized with port: %d", c.GetInt("http.port"))
 
 	// http server
 	s := route.NewHttpServer(fmt.Sprintf(":%d", c.GetInt("http.port")))
-	s.AccessWriters(accessWriter)
-	s.ErrWriters(errWriter, os.Stdout)
+	s.AccessWriters(httpAccessWriter)
+	s.ErrWriters(httpErrWriter, os.Stdout)
 	s.AddRoute(demo.Route)
 	if err := s.Run(c.GetString("http.mode")); err != nil {
 		panic(err)
