@@ -1,12 +1,14 @@
 package main
 
 import (
+	"blog-y/pkg/blog"
+	"blog-y/pkg/common/config"
+	"blog-y/pkg/common/log"
+	"blog-y/pkg/common/mysql"
+	"blog-y/pkg/common/route"
+	"blog-y/pkg/demo"
 	"fmt"
 	"github.com/spf13/cobra"
-	"go-template/pkg/config"
-	"go-template/pkg/demo"
-	"go-template/pkg/log"
-	"go-template/pkg/route"
 	"os"
 )
 
@@ -41,15 +43,30 @@ func main() {
 	// demo
 	demoLog := log.New("Demo", c.GetString("log.level"), writer, os.Stdout)
 	demo.WithLogger(demoLog)
+	// blog
+	blogLog := log.New("Blog", c.GetString("log.level"), writer, os.Stdout)
+	blog.WithLogger(blogLog)
 
 	appLog.Infof("config file: %s", configFile)
-	appLog.Infof("http initialized with port: %d", c.GetInt("http.port"))
+
+	// MySQL
+	db, err := mysql.New(c.GetString("mysql.host"),
+		c.GetInt("mysql.port"),
+		c.GetString("mysql.user"),
+		c.GetString("mysql.password"),
+		c.GetString("mysql.dbname"))
+	if err != nil {
+		panic(err)
+	}
+	blog.WithMySQL(db)
+	appLog.Infof("connect mysql successfully")
 
 	// http server
+	appLog.Infof("http initialized with port: %d", c.GetInt("http.port"))
 	s := route.NewHttpServer(fmt.Sprintf(":%d", c.GetInt("http.port")))
-	s.AccessWriters(httpAccessWriter)
+	s.AccessWriters(httpAccessWriter, os.Stdout)
 	s.ErrWriters(httpErrWriter, os.Stdout)
-	s.AddRoute(demo.Route)
+	s.AddRoute(demo.Route, blog.Route)
 	if err := s.Run(c.GetString("http.mode")); err != nil {
 		panic(err)
 	}

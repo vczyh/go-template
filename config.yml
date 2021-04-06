@@ -1,5 +1,5 @@
 http:
-  port: 8080
+  port: 9000
   mode: release
 log:
   level: DEBUG
@@ -7,3 +7,9 @@ log:
   http:
     access-log: logs/access.log
     error-log: logs/error.log
+mysql:
+  host: 10.0.44.13
+  port: 3306
+  user: root
+  password: Unicloud1221@
+  dbname: blog

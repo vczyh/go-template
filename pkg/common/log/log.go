@@ -73,6 +73,10 @@ func (l *Logger) Debug(msg string, kvs ...interface{}) {
 	l.sugar.Debugw(msg, kvs...)
 }
 
+func (l *Logger) Debugf(template string, args ...interface{}) {
+	l.sugar.Debugf(template, args...)
+}
+
 func (l *Logger) Info(msg string, kvs ...interface{}) {
 	l.sugar.Infow(msg, kvs...)
 }
@@ -83,6 +87,18 @@ func (l *Logger) Infof(template string, args ...interface{}) {
 
 func (l *Logger) Warn(msg string, kvs ...interface{}) {
 	l.sugar.Warnw(msg, kvs...)
+}
+
+func (l *Logger) Warnf(template string, args ...interface{}) {
+	l.sugar.Warnf(template, args...)
+}
+
+func (l *Logger) Error(msg string, kvs ...interface{}) {
+	l.sugar.Errorw(msg, kvs...)
+}
+
+func (l *Logger) Errorf(template string, args ...interface{}) {
+	l.sugar.Errorf(template, args...)
 }
 
 func NewRotate(file string, maxSize int, maxBackups int, maxAge int) io.WriteCloser {

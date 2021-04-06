@@ -1,8 +1,8 @@
 package demo
 
 import (
+	"blog-y/pkg/common/route"
 	"github.com/gin-gonic/gin"
-	"go-template/pkg/route"
 )
 
 func Route(router *gin.Engine) {

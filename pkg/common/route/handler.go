@@ -3,8 +3,8 @@ package route
 import "github.com/gin-gonic/gin"
 
 const (
-	_success = 0
-	_failed  = 1
+	_success = 1
+	_failed  = 0
 )
 
 type Res struct {
