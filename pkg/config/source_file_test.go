@@ -15,10 +15,10 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func TestPath(t *testing.T) {
-	c, err := New("./config.yml")
+func TestGetIntFromFile(t *testing.T) {
+	c, err := LoadFile("./config.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(c.GetString("http.port"))
+	fmt.Println(c.getInt("http.port"))
 }

@@ -1,7 +1,12 @@
 package route
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"go-template/pkg/log"
+	"math/rand"
+)
 
+// HTTP Response Handler
 const (
 	_success = 0
 	_failed  = 1
@@ -30,5 +35,18 @@ func Handle(handlerFunc HandlerFunc) gin.HandlerFunc {
 		}
 
 		c.JSON(200, res)
+	}
+}
+
+// HTTP Request Handler
+
+func TraceLoggerMiddleware(l *log.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 生成traceId
+		traceId := rand.Int()
+
+		c.Set(log.ContextLoggerKey, l.With("traceId", traceId))
+
+		c.Next()
 	}
 }

@@ -1,11 +1,17 @@
 package log
 
 import (
+	"context"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
+	"os"
 )
+
+var DefaultLogger = New("", "DEBUG", os.Stdout)
+
+const ContextLoggerKey = "ContextLoggerKey"
 
 type Logger struct {
 	name string
@@ -66,7 +72,25 @@ func New(name string, level string, writers ...io.Writer) *Logger {
 	logger.base = l
 	logger.sugar = l.Sugar()
 
+	logger.base.With()
+
 	return logger
+}
+
+func WithContext(ctx context.Context) *Logger {
+	if ctx == nil {
+		return DefaultLogger
+	}
+	if logger, ok := ctx.Value(ContextLoggerKey).(*Logger); ok {
+		return logger
+	}
+	return DefaultLogger
+}
+
+func (l *Logger) With(args ...interface{}) *Logger {
+	return &Logger{
+		sugar: l.sugar.With(args...),
+	}
 }
 
 func (l *Logger) Debug(msg string, kvs ...interface{}) {

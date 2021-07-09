@@ -1,9 +1,8 @@
 http:
   port: 8080
   mode: release
+  access-log: logs/access.log
+  error-log: logs/error.log
 log:
   level: DEBUG
   path: logs/app.log
-  http:
-    access-log: logs/access.log
-    error-log: logs/error.log

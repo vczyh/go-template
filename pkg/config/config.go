@@ -1,71 +1,74 @@
 package config
 
 import (
-	"github.com/spf13/viper"
-	"time"
+	"fmt"
 )
 
+var config = &Config{}
+
 type Config struct {
-	viper *viper.Viper
+	httpPort      int
+	httpMode      string
+	httpAccessLog string
+	httpErrorLog  string
+
+	logLevel string
+	logPath  string
 }
 
-func New(file string) (*Config, error) {
-	v := viper.New()
-	v.SetConfigFile(file)
+// source maybe nil
+func ReadFromMultiSources(env, file Source) error {
+	var c Config
 
-	if err := v.ReadInConfig(); err != nil {
-		return nil,err
+	if err := c.getKeys(env, file); err != nil {
+		return err
+	}
+	config = &c
+	return nil
+}
+
+func (c *Config) getKeys(env, file Source) error {
+	if file == nil {
+		return fmt.Errorf("file source can't be nil")
 	}
 
-	return &Config{
-		viper: v,
-	}, nil
+	// http
+	c.httpPort = file.getInt("http.port")
+	c.httpMode = file.getString("http.mode")
+	c.httpAccessLog = file.getString("http.access-log")
+	c.httpErrorLog = file.getString("http.error-log")
+
+	// log
+	c.logLevel = file.getString("log.level")
+	c.logPath = file.getString("log.path")
+
+	return nil
 }
 
-// Set
-func (c *Config) Set(key string, value interface{}) {
-	c.viper.Set(key, value)
+func Info() string {
+	return fmt.Sprintf("%+v", *config)
 }
 
-func (c *Config) SetDefault(key string, value interface{}) {
-	c.viper.SetDefault(key, value)
+func GetHttpPort() int {
+	return config.httpPort
 }
 
-// Get
-func (c *Config) Get(key string) interface{} {
-	return c.viper.Get(key)
+func GetHttpMode() string {
+	return config.httpMode
 }
 
-func (c *Config) GetString(key string) string {
-	return c.viper.GetString(key)
+func GetHttpAccessLog() string {
+	return config.httpAccessLog
 }
 
-func (c *Config) GetInt(key string) int {
-	return c.viper.GetInt(key)
+func GetHttpErrorLog() string {
+	return config.httpErrorLog
 }
 
-func (c *Config) GetFloat64(key string) float64 {
-	return c.viper.GetFloat64(key)
+func GetLogLevel() string {
+	return config.logLevel
 }
 
-func (c *Config) GetBool(key string) bool {
-	return c.viper.GetBool(key)
-}
-
-// time
-func (c *Config) GetDuGetTimeration(key string) time.Time {
-	return c.viper.GetTime(key)
-}
-
-func (c *Config) GetDuration(key string) time.Duration {
-	return c.viper.GetDuration(key)
-}
-
-// slice
-func (c *Config) GetStringSlice(key string) []string {
-	return c.viper.GetStringSlice(key)
-}
-
-func (c *Config) GetIntSlice(key string) []int {
-	return c.viper.GetIntSlice(key)
+func GetLogPath() string {
+	return config.logPath
 }
